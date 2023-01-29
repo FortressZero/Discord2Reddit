@@ -39,7 +39,8 @@ This bot is currently in progress! More will be added soon.""",
     await ctx.send(embed=embed)
 
 # image detection and upload
-image_exts = ["png", "jpeg", "jpg", "gif", "jpg", "mp4", "mov"]
+image_exts = ["png", "jpeg", "jpg", "jpg"]
+# in the future provide support for mov, mp4, gif
 @bot.event
 async def on_message(message: discord.Message):
     for attachment in message.attachments:

@@ -7,6 +7,7 @@ import socket
 import sys
 
 import asyncpraw
+import pprint
 
 reddit = asyncpraw.Reddit(
     client_id=os.getenv('CLIENT_ID'),
@@ -14,6 +15,9 @@ reddit = asyncpraw.Reddit(
     password=os.getenv('REDDIT_PASSWORD'),
     user_agent=os.getenv('USER_AGENT'),
     username=os.getenv('REDDIT_USERNAME'),
+    ratelimit_seconds = 300, #rmv later
 )
+
+
 
 # reminder to self: look at using HTTPS proxy with asyncpraw, logging, etc.
