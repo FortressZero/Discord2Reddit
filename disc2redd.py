@@ -49,7 +49,7 @@ async def help(ctx):
     await ctx.send(embed=embed)
 
 # image detection and upload
-image_exts = ["png", "jpeg", "jpg", "jpg", "webp"]
+image_exts = ["png", "jpeg", "jpg", "jpg"]
 # in the future provide support for mov, mp4, gif
 @bot.event
 async def on_message(message: discord.Message):

@@ -25,11 +25,11 @@ async def submit_images(msg_title: str, subreddit: Subreddit, nsfwFlag: bool, po
     if not reddit_files:
         return
     elif len(reddit_files) == 1:
-        await subreddit.submit_image(title=msg_title, image_path=reddit_files[0], nsfw=nsfwFlag)
+        await subreddit.submit_image(title=msg_title, image_path=f"{parent_path}/{reddit_files[0]}", nsfw=nsfwFlag)
     else:
         images = [{"image_path": f"{parent_path}/{filename}"} for filename in reddit_files]
         # might not work? check back here l8r
-        await subreddit.submit_gallery(title=msg_title,  nsfw=nsfwFlag)
+        await subreddit.submit_gallery(title=msg_title, images=images, nsfw=nsfwFlag)
     shutil.rmtree(parent_path)
 
 # reminder to self: look at using HTTPS proxy with asyncpraw, logging, etc.
