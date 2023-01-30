@@ -1,13 +1,18 @@
 # bot.py
 
 import os
-import random
 import discord
 from dotenv import load_dotenv
 from discord.ext import commands
+from nudenet import NudeClassifier
+
+classifier = NudeClassifier()
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+subreddit = os.getenv('SUBREDDIT')
+
+count = 0
 
 intents = discord.Intents.default()
 intents.members = True
@@ -34,7 +39,7 @@ async def ping(ctx):
     
 @bot.command()
 async def test(ctx):
-    await ctx.send("hello")
+    await ctx.send(subreddit)
 
 @bot.command(name='help')
 async def help(ctx):
@@ -45,15 +50,31 @@ async def help(ctx):
     await ctx.send(embed=embed)
 
 # image detection and upload
-image_exts = ["png", "jpeg", "jpg", "jpg"]
+image_exts = ["png", "jpeg", "jpg", "jpg", "webp"]
 # in the future provide support for mov, mp4, gif
 @bot.event
 async def on_message(message: discord.Message):
     if message.attachments:
-       for attachment in message.attachments:
+        nsfwFlag = False
+        curr = 0
+        for attachment in message.attachments:
             if any(attachment.filename.lower().endswith(image) for image in image_exts):
-                await attachment.save(f'{os.getcwd()}/attachments/{attachment.filename}')
-                print(f"attachments saved")
+                path_name = f'{os.getcwd()}/attachments/{count}-{curr}'
+                curr += 1
+                await attachment.save(path_name)
+                print(f"attachment saved")
+                classifier_result = classifier.classify(path_name)
+                if (classifier_result[path_name]['unsafe'] > .9):
+                    os.remove(path_name)
+                    break
+                elif (classifier_result[path_name]['unsafe'] > .6):
+                    nsfwFlag = True
+        count = count + 1
+        count = count % 100000
+        title = ""
+        if message.content:
+            title = message.content
+        # submit_images(title, nsfwFlag, count, subreddit)
     await bot.process_commands(message)
-    
+
 bot.run(TOKEN)
