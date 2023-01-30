@@ -12,13 +12,12 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 subreddit = os.getenv('SUBREDDIT')
 
-count = 0
-
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix='!d2r ',intents=intents)
 bot.remove_command('help')
+bot.post_id = 0
 
 @bot.event
 async def on_ready():
@@ -57,23 +56,32 @@ async def on_message(message: discord.Message):
     if message.attachments:
         nsfwFlag = False
         curr = 0
+        parent_path = f'{os.getcwd()}/attachments/{bot.post_id}'
+        os.mkdir(parent_path)
         for attachment in message.attachments:
             if any(attachment.filename.lower().endswith(image) for image in image_exts):
-                path_name = f'{os.getcwd()}/attachments/{count}-{curr}'
+                path_name = f'{parent_path}/{attachment.filename}'
                 curr += 1
                 await attachment.save(path_name)
                 print(f"attachment saved")
                 classifier_result = classifier.classify(path_name)
-                if (classifier_result[path_name]['unsafe'] > .9):
+                if (classifier_result[path_name]['unsafe'] > .85):
                     os.remove(path_name)
                     break
                 elif (classifier_result[path_name]['unsafe'] > .6):
                     nsfwFlag = True
-        count = count + 1
-        count = count % 100000
+        if not os.listdir(parent_path):
+            os.rmdir(parent_path)
+            print(f"not a valid image format")
+        bot.post_id = bot.post_id + 1
+        bot.post_id = bot.post_id % 100000
         title = ""
         if message.content:
             title = message.content
+        else:
+            title = "testing"
+        # change above so that title is "submitted by USER"
+        # and any message content is a reply to the post
         # submit_images(title, nsfwFlag, count, subreddit)
     await bot.process_commands(message)
 
