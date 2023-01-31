@@ -2,3 +2,4 @@ attachments
 env
 .env
 __pycache__
+main.py
