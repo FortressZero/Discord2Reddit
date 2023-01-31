@@ -1,0 +1,1 @@
+asyncpraw version 7.6 onwards has a buggy submit_images instance, use 7.5.0

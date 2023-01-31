@@ -5,6 +5,7 @@ import discord
 from dotenv import load_dotenv
 from discord.ext import commands
 from nudenet import NudeClassifier
+from redditapi import submit_images
 
 classifier = NudeClassifier()
 
@@ -38,7 +39,7 @@ async def ping(ctx):
     
 @bot.command()
 async def test(ctx):
-    await ctx.send(subreddit)
+    await ctx.send(f"test!")
 
 @bot.command(name='help')
 async def help(ctx):
@@ -73,8 +74,6 @@ async def on_message(message: discord.Message):
         if not os.listdir(parent_path):
             os.rmdir(parent_path)
             print(f"not a valid image format")
-        bot.post_id = bot.post_id + 1
-        bot.post_id = bot.post_id % 100000
         title = ""
         if message.content:
             title = message.content
@@ -82,7 +81,11 @@ async def on_message(message: discord.Message):
             title = "testing"
         # change above so that title is "submitted by USER"
         # and any message content is a reply to the post
-        # submit_images(title, nsfwFlag, count, subreddit)
+        print(f"{subreddit}")
+        await submit_images(title, subreddit, nsfwFlag, bot.post_id)
+        bot.post_id = bot.post_id + 1
+        bot.post_id = bot.post_id % 100000
+        
     await bot.process_commands(message)
 
 bot.run(TOKEN)
